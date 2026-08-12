@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wealth Accumulation & Retirement Spending Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      color: #222;
+      background: #f7f9fc;
+    }
+
+    h1, h2, h3 {
+      margin-top: 24px;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #d9e1ec;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #c7d1e0;
+      border-radius: 6px;
+      box-sizing: border-box;
+    }
+
+    button {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #004b8d;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    button:hover {
+      background: #003766;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .summary .tile {
+      background: #f3f7fb;
+      border: 1px solid #d9e1ec;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .summary .tile .label {
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .summary .tile .value {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 12px;
+      background: white;
+    }
+
+    th, td {
+      border: 1px solid #d9e1ec;
+      padding: 6px 8px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #eef4fa;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    td:first-child, th:first-child,
+    td:nth-child(2), th:nth-child(2) {
+      text-align: center;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 520px;
+      border: 1px solid #d9e1ec;
+      border-radius: 8px;
+      background: white;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    @media (max-width: 1000px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Wealth Accumulation & Retirement Spending Calculator</h1>
+
+  <div class="card">
+    <h2>Assumptions & Inputs</h2>
+
+    <div class="grid">
+      <div>
+        <label for="startYear">Start Year</label>
+        <input id="startYear" type="number" value="2025" />
+      </div>
+
+      <div>
+        <label for="startAge">Start Age</label>
+        <input id="startAge" type="number" value="35" />
+      </div>
+
+      <div>
+        <label for="retireAge">Retirement Age</label>
+        <input id="retireAge" type="number" value="65" />
+      </div>
+
+      <div>
+        <label for="endAge">Projection End Age</label>
+        <input id="endAge" type="number" value="95" />
+      </div>
+
+      <div>
+        <label for="inflation">Inflation (%)</label>
+        <input id="inflation" type="number" step="0.01" value="2.50" />
+      </div>
+
+      <div>
+        <label for="incomeGrowth">Before-Tax Income Yearly Growth (%)</label>
+        <input id="incomeGrowth" type="number" step="0.01" value="3.00" />
+      </div>
+
+      <div>
+        <label for="rrspReturn">RRSP Annualized Return Before Retirement (%)</label>
+        <input id="rrspReturn" type="number" step="0.01" value="6.00" />
+      </div>
+
+      <div>
+        <label for="tfsaReturn">TFSA Annualized Return Before Retirement (%)</label>
+        <input id="tfsaReturn" type="number" step="0.01" value="6.00" />
+      </div>
+
+      <div>
+        <label for="nonRegReturn">Non-Reg Annualized Return Before Retirement (%)</label>
+        <input id="nonRegReturn" type="number" step="0.01" value="5.00" />
+      </div>
+
+      <div>
+        <label for="income0">2025 Before-Tax Income ($)</label>
+        <input id="income0" type="number" step="0.01" value="120000" />
+      </div>
+
+      <div>
+        <label for="housing0">2025 Housing Costs ($)</label>
+        <input id="housing0" type="number" step="0.01" value="30000" />
+      </div>
+
+      <div>
+        <label for="other0">2025 Other Costs ($)</label>
+        <input id="other0" type="number" step="0.01" value="20000" />
+      </div>
+
+      <div>
+        <label for="nonReg0">2025 Non-Reg Start Value ($)</label>
+        <input id="nonReg0" type="number" step="0.01" value="50000" />
+      </div>
+
+      <div>
+        <label for="tfsa0">2025 TFSA Start Value ($)</label>
+        <input id="tfsa0" type="number" step="0.01" value="80000" />
+      </div>
+
+      <div>
+        <label for="rrsp0">2025 RRSP Start Value ($)</label>
+        <input id="rrsp0" type="number" step="0.01" value="100000" />
+      </div>
+
+      <div>
+        <label for="retInflation">Retirement Inflation (%)</label>
+        <input id="retInflation" type="number" step="0.01" value="2.50" />
+      </div>
+
+      <div>
+        <label for="retNonRegReturn">After Retirement Non-Reg Return (%)</label>
+        <input id="retNonRegReturn" type="number" step="0.01" value="4.00" />
+      </div>
+
+      <div>
+        <label for="retRrspReturn">After Retirement RRSP Return (%)</label>
+        <input id="retRrspReturn" type="number" step="0.01" value="4.00" />
+      </div>
+
+      <div>
+        <label for="retTfsaReturn">After Retirement TFSA Return (%)</label>
+        <input id="retTfsaReturn" type="number" step="0.01" value="4.00" />
+      </div>
+
+      <div>
+        <label for="retWithdraw0">Annual Retirement Withdrawal at Retirement Start ($)</label>
+        <input id="retWithdraw0" type="number" step="0.01" value="70000" />
+      </div>
+    </div>
+
+    <div style="margin-top: 16px;">
+      <button onclick="runCalculator()">Calculate</button>
+    </div>
+
+    <p class="small" style="margin-top: 10px;">
+      Present values are shown in <strong>2025 dollars</strong> using inflation discounting.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>Summary</h2>
+
+    <div id="summary" class="summary"></div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <h2>Wealth Accumulation</h2>
+      <div class="table-wrap">
+        <table id="accTable"></table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Retirement Spending</h2>
+      <div class="table-wrap">
+        <table id="retTable"></table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function pct(v) {
+      return Number(v) / 100;
+    }
+
+    function val(id) {
+      return parseFloat(document.getElementById(id).value || 0);
+    }
+
+    function fmt(n) {
+      return Number(n || 0).toLocaleString('en-CA', {
+        style: 'currency',
+        currency: 'CAD',
+        maximumFractionDigits: 0
+      });
+    }
+
+    function safe(n) {
+      return isFinite(n) ? n : 0;
+    }
+
+    function pv(futureValue, inflationRate, yearsFrom2025) {
+      return futureValue / Math.pow(1 + inflationRate, yearsFrom2025);
+    }
+
+    function tfsaLimit(year) {
+      return 7000 + Math.floor((year - 2025) / 5) * 500;
+    }
+
+    function progressiveTax(income, brackets) {
+      let tax = 0;
+      let remaining = income;
+
+      for (let i = 0; i < brackets.length; i++) {
+        const b = brackets[i];
+        const lower = b.from;
+        const upper = b.to;
+        const rate = b.rate;
+
+        if (income <= lower) continue;
+
+        const taxableInBracket = Math.min(income, upper) - lower;
+        if (taxableInBracket > 0) {
+          tax += taxableInBracket * rate;
+        }
+      }
+
+      return tax;
+    }
+
+    function federalTax(income) {
+      const brackets = [
+        { from: 0, to: 58523, rate: 0.14 },
+        { from: 58523, to: 117045, rate: 0.205 },
+        { from: 117045, to: 181440, rate: 0.26 },
+        { from: 181440, to: 258482, rate: 0.29 },
+        { from: 258482, to: Infinity, rate: 0.33 }
+      ];
+      return progressiveTax(income, brackets);
+    }
+
+    function ontarioTax(income) {
+      const brackets = [
+        { from: 0, to: 30995, rate: 0.0879 },
+        { from: 30995, to: 61991, rate: 0.1495 },
+        { from: 61991, to: 97417, rate: 0.1667 },
+        { from: 97417, to: 157124, rate: 0.175 },
+        { from: 157124, to: Infinity, rate: 0.21 }
+      ];
+      return progressiveTax(income, brackets);
+    }
+
+    function afterTaxIncome(beforeTax) {
+      const fed = federalTax(beforeTax);
+      const ont = ontarioTax(beforeTax);
+      return beforeTax - fed - ont;
+    }
+
+    function buildAccumulation(inputs) {
+      const rows = [];
+      const years = inputs.retireAge - inputs.startAge + 1;
+
+      let income = inputs.income0;
+      let housing = inputs.housing0;
+      let other = inputs.other0;
+
+      let nonRegStart = inputs.nonReg0;
+      let tfsaStart = inputs.tfsa0;
+      let rrspStart = inputs.rrsp0;
+
+      for (let i = 0; i < years; i++) {
+        const year = inputs.startYear + i;
+        const age = inputs.startAge + i;
+
+        if (i > 0) {
+          income *= (1 + inputs.incomeGrowth);
+          housing *= (1 + inputs.inflation);
+          other *= (1 + inputs.inflation);
+        }
+
+        const afterTax = afterTaxIncome(income);
+        const investableIncome = afterTax - housing - other;
+        const tfsaContrib = tfsaLimit(year);
+        const rrspMax = income * 0.18;
+        const rrspContrib = Math.min(Math.max(investableIncome - tfsaContrib, 0), rrspMax);
+        const afterContributions = afterTax - housing - other - tfsaContrib - rrspContrib;
+
+        const nonRegEnd = Math.max(0, nonRegStart * (1 + inputs.nonRegReturn) + Math.max(afterContributions, 0));
+        const tfsaEnd = Math.max(0, tfsaStart * (1 + inputs.tfsaReturn) + Math.max(tfsaContrib, 0));
+        const rrspEnd = Math.max(0, rrspStart * (1 + inputs.rrspReturn) + Math.max(rrspContrib, 0));
+
+        const totalWealth = nonRegEnd + tfsaEnd + rrspEnd;
+        const yearsFrom2025 = year - 2025;
+
+        rows.push({
+          year,
+          age,
+          beforeTaxIncome: safe(income),
+          afterTaxIncome: safe(afterTax),
+          afterTaxIncomePV: safe(pv(afterTax, inputs.inflation, yearsFrom2025)),
+          housingCosts: safe(housing),
+          housingCostsPV: safe(pv(housing, inputs.inflation, yearsFrom2025)),
+          otherCosts: safe(other),
+          otherCostsPV: safe(pv(other, inputs.inflation, yearsFrom2025)),
+          investableIncome: safe(investableIncome),
+          investableIncomePV: safe(pv(investableIncome, inputs.inflation, yearsFrom2025)),
+          tfsaContribution: safe(tfsaContrib),
+          rrspContribution: safe(rrspContrib),
+          afterContributions: safe(afterContributions),
+          nonRegStart: safe(nonRegStart),
+          nonRegEnd: safe(nonRegEnd),
+          nonRegEndPV: safe(pv(nonRegEnd, inputs.inflation, yearsFrom2025)),
+          tfsaStart: safe(tfsaStart),
+          tfsaEnd: safe(tfsaEnd),
+          tfsaEndPV: safe(pv(tfsaEnd, inputs.inflation, yearsFrom2025)),
+          rrspStart: safe(rrspStart),
+          rrspEnd: safe(rrspEnd),
+          rrspEndPV: safe(pv(rrspEnd, inputs.inflation, yearsFrom2025)),
+          totalWealth: safe(totalWealth),
+          totalWealthPV: safe(pv(totalWealth, inputs.inflation, yearsFrom2025))
+        });
+
+        nonRegStart = nonRegEnd;
+        tfsaStart = tfsaEnd;
+        rrspStart = rrspEnd;
+      }
+
+      return rows;
+    }
+
+    function buildRetirement(inputs, retirementStart) {
+      const rows = [];
+      const years = inputs.endAge - inputs.retireAge + 1;
+
+      let rrspOpen = retirementStart.rrspEnd;
+      let nonRegOpen = retirementStart.nonRegEnd;
+      let tfsaOpen = retirementStart.tfsaEnd;
+
+      for (let i = 0; i < years; i++) {
+        const year = retirementStart.year + i;
+        const age = retirementStart.age + i;
+
+        const withdrawalRequired = inputs.retWithdraw0 * Math.pow(1 + inputs.retInflation, i);
+        let remainingNeed = withdrawalRequired;
+
+        const rrspGrowthBase = rrspOpen * (1 + inputs.retRrspReturn);
+        const rrspWithdrawal = Math.min(remainingNeed, rrspGrowthBase);
+        const rrspEnd = Math.max(0, rrspGrowthBase - rrspWithdrawal);
+        remainingNeed -= rrspWithdrawal;
+
+        const nonRegGrowthBase = nonRegOpen * (1 + inputs.retNonRegReturn);
+        const nonRegWithdrawal = Math.min(remainingNeed, nonRegGrowthBase);
+        const nonRegEnd = Math.max(0, nonRegGrowthBase - nonRegWithdrawal);
+        remainingNeed -= nonRegWithdrawal;
+
+        const tfsaGrowthBase = tfsaOpen * (1 + inputs.retTfsaReturn);
+        const tfsaWithdrawal = Math.min(remainingNeed, tfsaGrowthBase);
+        const tfsaEnd = Math.max(0, tfsaGrowthBase - tfsaWithdrawal);
+        remainingNeed -= tfsaWithdrawal;
+
+        const totalWealth = rrspEnd + nonRegEnd + tfsaEnd;
+        const yearsFrom2025 = year - 2025;
+
+        rows.push({
+          year,
+          age,
+          withdrawalRequired: safe(withdrawalRequired),
+          withdrawalRequiredPV: safe(pv(withdrawalRequired, inputs.retInflation, yearsFrom2025)),
+          rrspOpen: safe(rrspOpen),
+          rrspWithdrawal: safe(rrspWithdrawal),
+          rrspEnd: safe(rrspEnd),
+          nonRegOpen: safe(nonRegOpen),
+          nonRegWithdrawal: safe(nonRegWithdrawal),
+          nonRegEnd: safe(nonRegEnd),
+          tfsaOpen: safe(tfsaOpen),
+          tfsaWithdrawal: safe(tfsaWithdrawal),
+          tfsaEnd: safe(tfsaEnd),
+          unfundedGap: safe(remainingNeed),
+          totalWealth: safe(totalWealth),
+          totalWealthPV: safe(pv(totalWealth, inputs.retInflation, yearsFrom2025))
+        });
+
+        rrspOpen = rrspEnd;
+        nonRegOpen = nonRegEnd;
+        tfsaOpen = tfsaEnd;
+      }
+
+      return rows;
+    }
+
+    function renderSummary(accRows, retRows) {
+      const accLast = accRows[accRows.length - 1];
+      const retLast = retRows[retRows.length - 1];
+
+      let depletionAge = null;
+      for (const row of retRows) {
+        if (row.totalWealth <= 0) {
+          depletionAge = row.age;
+          break;
+        }
+      }
+
+      const html = `
+        <div class="tile">
+          <div class="label">Retirement Year</div>
+          <div class="value">${accLast.year}</div>
+        </div>
+        <div class="tile">
+          <div class="label">Retirement Age</div>
+          <div class="value">${accLast.age}</div>
+        </div>
+        <div class="tile">
+          <div class="label">Wealth at Retirement</div>
+          <div class="value">${fmt(accLast.totalWealth)}</div>
+        </div>
+        <div class="tile">
+          <div class="label">Wealth at Retirement PV</div>
+          <div class="value">${fmt(accLast.totalWealthPV)}</div>
+        </div>
+        <div class="tile">
+          <div class="label">Final Wealth at End Age</div>
+          <div class="value">${fmt(retLast.totalWealth)}</div>
+        </div>
+        <div class="tile">
+          <div class="label">Final Wealth PV</div>
+          <div class="value">${fmt(retLast.totalWealthPV)}</div>
+        </div>
+        <div class="tile">
+          <div class="label">Depletion Age</div>
+          <div class="value">${depletionAge === null ? "Not depleted" : depletionAge}</div>
+        </div>
+      `;
+
+      document.getElementById("summary").innerHTML = html;
+    }
+
+    function renderAccumulationTable(rows) {
+      const headers = [
+        "Year", "Age", "Before-Tax Income", "After-Tax Income", "After-Tax Income PV",
+        "Housing Costs", "Housing Costs PV", "Other Costs", "Other Costs PV",
+        "Investable Income", "Investable Income PV", "TFSA Contribution", "RRSP Contribution",
+        "After Contributions", "Non-Reg Start", "Non-Reg End", "Non-Reg End PV",
+        "TFSA Start", "TFSA End", "TFSA End PV", "RRSP Start", "RRSP End", "RRSP End PV",
+        "Total Wealth", "Total Wealth PV"
+      ];
+
+      let html = "<thead><tr>";
+      headers.forEach(h => html += `<th>${h}</th>`);
+      html += "</tr></thead><tbody>";
+
+      rows.forEach(r => {
+        html += `
+          <tr>
+            <td>${r.year}</td>
+            <td>${r.age}</td>
+            <td>${fmt(r.beforeTaxIncome)}</td>
+            <td>${fmt(r.afterTaxIncome)}</td>
+            <td>${fmt(r.afterTaxIncomePV)}</td>
+            <td>${fmt(r.housingCosts)}</td>
+            <td>${fmt(r.housingCostsPV)}</td>
+            <td>${fmt(r.otherCosts)}</td>
+            <td>${fmt(r.otherCostsPV)}</td>
+            <td>${fmt(r.investableIncome)}</td>
+            <td>${fmt(r.investableIncomePV)}</td>
+            <td>${fmt(r.tfsaContribution)}</td>
+            <td>${fmt(r.rrspContribution)}</td>
+            <td>${fmt(r.afterContributions)}</td>
+            <td>${fmt(r.nonRegStart)}</td>
+            <td>${fmt(r.nonRegEnd)}</td>
+            <td>${fmt(r.nonRegEndPV)}</td>
+            <td>${fmt(r.tfsaStart)}</td>
+            <td>${fmt(r.tfsaEnd)}</td>
+            <td>${fmt(r.tfsaEndPV)}</td>
+            <td>${fmt(r.rrspStart)}</td>
+            <td>${fmt(r.rrspEnd)}</td>
+            <td>${fmt(r.rrspEndPV)}</td>
+            <td>${fmt(r.totalWealth)}</td>
+            <td>${fmt(r.totalWealthPV)}</td>
+          </tr>
+        `;
+      });
+
+      html += "</tbody>";
+      document.getElementById("accTable").innerHTML = html;
+    }
+
+    function renderRetirementTable(rows) {
+      const headers = [
+        "Year", "Age", "Withdrawal Required", "Withdrawal PV",
+        "RRSP Opening", "RRSP Withdrawal", "RRSP Ending",
+        "Non-Reg Opening", "Non-Reg Withdrawal", "Non-Reg Ending",
+        "TFSA Opening", "TFSA Withdrawal", "TFSA Ending",
+        "Unfunded Gap", "Total Wealth", "Total Wealth PV"
+      ];
+
+      let html = "<thead><tr>";
+      headers.forEach(h => html += `<th>${h}</th>`);
+      html += "</tr></thead><tbody>";
+
+      rows.forEach(r => {
+        html += `
+          <tr>
+            <td>${r.year}</td>
+            <td>${r.age}</td>
+            <td>${fmt(r.withdrawalRequired)}</td>
+            <td>${fmt(r.withdrawalRequiredPV)}</td>
+            <td>${fmt(r.rrspOpen)}</td>
+            <td>${fmt(r.rrspWithdrawal)}</td>
+            <td>${fmt(r.rrspEnd)}</td>
+            <td>${fmt(r.nonRegOpen)}</td>
+            <td>${fmt(r.nonRegWithdrawal)}</td>
+            <td>${fmt(r.nonRegEnd)}</td>
+            <td>${fmt(r.tfsaOpen)}</td>
+            <td>${fmt(r.tfsaWithdrawal)}</td>
+            <td>${fmt(r.tfsaEnd)}</td>
+            <td>${fmt(r.unfundedGap)}</td>
+            <td>${fmt(r.totalWealth)}</td>
+            <td>${fmt(r.totalWealthPV)}</td>
+          </tr>
+        `;
+      });
+
+      html += "</tbody>";
+      document.getElementById("retTable").innerHTML = html;
+    }
+
+    function runCalculator() {
+      const inputs = {
+        startYear: val("startYear"),
+        startAge: val("startAge"),
+        retireAge: val("retireAge"),
+        endAge: val("endAge"),
+
+        inflation: pct(val("inflation")),
+        incomeGrowth: pct(val("incomeGrowth")),
+        rrspReturn: pct(val("rrspReturn")),
+        tfsaReturn: pct(val("tfsaReturn")),
+        nonRegReturn: pct(val("nonRegReturn")),
+
+        income0: val("income0"),
+        housing0: val("housing0"),
+        other0: val("other0"),
+        nonReg0: val("nonReg0"),
+        tfsa0: val("tfsa0"),
+        rrsp0: val("rrsp0"),
+
+        retInflation: pct(val("retInflation")),
+        retNonRegReturn: pct(val("retNonRegReturn")),
+        retRrspReturn: pct(val("retRrspReturn")),
+        retTfsaReturn: pct(val("retTfsaReturn")),
+        retWithdraw0: val("retWithdraw0")
+      };
+
+      if (inputs.retireAge < inputs.startAge) {
+        alert("Retirement age must be greater than or equal to start age.");
+        return;
+      }
+
+      if (inputs.endAge < inputs.retireAge) {
+        alert("Projection end age must be greater than or equal to retirement age.");
+        return;
+      }
+
+      const accRows = buildAccumulation(inputs);
+      const retirementStart = accRows[accRows.length - 1];
+      const retRows = buildRetirement(inputs, retirementStart);
+
+      renderSummary(accRows, retRows);
+      renderAccumulationTable(accRows);
+      renderRetirementTable(retRows);
+    }
+
+    runCalculator();
+  </script>
+</body>
+</html>

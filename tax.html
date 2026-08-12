@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>2026 Ontario Net Income Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      margin: 0;
+      padding: 40px 20px;
+      color: #222;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .note {
+      background: #eef5ff;
+      border: 1px solid #cfe0ff;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cfd6e4;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #1f5eff;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #184ed6;
+    }
+
+    .result {
+      margin-top: 24px;
+      padding: 16px;
+      border-radius: 8px;
+      background: #f8fbff;
+      border: 1px solid #d9e7ff;
+      display: none;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .label {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .subsection {
+      margin-top: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid #dfe5ef;
+      padding: 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f3f6fb;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 13px;
+    }
+
+    @media (max-width: 700px) {
+      .grid,
+      .result-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>2026 Ontario Net Income Calculator</h1>
+
+    <div class="note">
+      This local calculator includes:
+      <ul>
+        <li>2026 federal tax brackets</li>
+        <li>2026 Ontario tax brackets</li>
+        <li>2026 CPP and EI employee deductions</li>
+        <li>Federal Basic Personal Amount credit</li>
+        <li>Ontario Basic Personal Amount credit</li>
+        <li>Federal and Ontario credits on CPP and EI</li>
+      </ul>
+
+      It still does not include Ontario surtax, Ontario health premium, CPP2, or other advanced payroll rules.
+    </div>
+
+    <div class="grid">
+      <div>
+        <label for="income">Annual Salary</label>
+        <input type="number" id="income" value="100000" min="0" step="0.01" />
+      </div>
+
+      <div>
+        <label for="deductions">Tax Deductions</label>
+        <input type="number" id="deductions" value="0" min="0" step="0.01" />
+      </div>
+    </div>
+
+    <button onclick="calculateAll()">Calculate</button>
+
+    <div id="result" class="result">
+      <h2>Results</h2>
+
+      <div class="result-grid">
+        <div class="card">
+          <div class="label">Gross Annual Income</div>
+          <div class="value" id="grossIncome">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Taxable Income</div>
+          <div class="value" id="taxableIncome">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Federal Tax Before Credits</div>
+          <div class="value" id="federalTaxBeforeCredits">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Federal Tax After Credits</div>
+          <div class="value" id="federalTax">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Ontario Tax Before Credits</div>
+          <div class="value" id="ontarioTaxBeforeCredits">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Ontario Tax After Credits</div>
+          <div class="value" id="ontarioTax">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">CPP</div>
+          <div class="value" id="cppAmount">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">EI</div>
+          <div class="value" id="eiAmount">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Total Deductions</div>
+          <div class="value" id="totalDeductions">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Net Annual Income</div>
+          <div class="value" id="netAnnual">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Net Monthly Income</div>
+          <div class="value" id="netMonthly">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Net Biweekly Income</div>
+          <div class="value" id="netBiweekly">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Federal Effective Tax Rate</div>
+          <div class="value" id="federalRate">-</div>
+        </div>
+
+        <div class="card">
+          <div class="label">Total Effective Deduction Rate</div>
+          <div class="value" id="effectiveRate">-</div>
+        </div>
+      </div>
+
+      <div class="subsection">
+        <h3>Federal Tax Breakdown</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Bracket</th>
+              <th>Taxable Portion</th>
+              <th>Rate</th>
+              <th>Tax</th>
+            </tr>
+          </thead>
+          <tbody id="federalBreakdown"></tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>Ontario Tax Breakdown</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Bracket</th>
+              <th>Taxable Portion</th>
+              <th>Rate</th>
+              <th>Tax</th>
+            </tr>
+          </thead>
+          <tbody id="ontarioBreakdown"></tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>Tax Credit Breakdown</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Credit</th>
+              <th>Base Amount</th>
+              <th>Rate</th>
+              <th>Tax Reduction</th>
+            </tr>
+          </thead>
+          <tbody id="creditBreakdown"></tbody>
+        </table>
+      </div>
+
+      <div class="subsection">
+        <h3>Payroll Contributions</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Component</th>
+              <th>Basis</th>
+              <th>Rate</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody id="payrollBreakdown"></tbody>
+        </table>
+      </div>
+
+      <p class="muted">
+        Net income = gross income - federal tax after credits - Ontario tax after credits - CPP - EI.
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const PAYROLL_2026 = {
+      cpp: {
+        maxPensionableEarnings: 74600,
+        basicExemption: 3500,
+        maxContributoryEarnings: 71100,
+        employeeRate: 0.0595,
+        maxEmployeeContribution: 4230.45
+      },
+      ei: {
+        maxInsurableEarnings: 68900,
+        employeeRate: 0.0163,
+        maxEmployeePremium: 1123.07
+      }
+    };
+
+    const CREDITS_2026 = {
+      federal: {
+        lowestRate: 0.14,
+        basicPersonalAmountLowIncome: 16452,
+        basicPersonalAmountHighIncome: 14829,
+        phaseOutStart: 181440,
+        phaseOutEnd: 258482
+      },
+      ontario: {
+        lowestRate: 0.0505,
+        basicPersonalAmount: 12989
+      }
+    };
+
+    const federalBrackets = [
+      { min: 0, max: 58523, rate: 0.14 },
+      { min: 58523, max: 117045, rate: 0.205 },
+      { min: 117045, max: 181440, rate: 0.26 },
+      { min: 181440, max: 258482, rate: 0.29 },
+      { min: 258482, max: Infinity, rate: 0.33 }
+    ];
+
+    const ontarioBrackets = [
+      { min: 0, max: 53891, rate: 0.0505 },
+      { min: 53891, max: 107785, rate: 0.0915 },
+      { min: 107785, max: 150000, rate: 0.1116 },
+      { min: 150000, max: 220000, rate: 0.1216 },
+      { min: 220000, max: Infinity, rate: 0.1316 }
+    ];
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('en-CA', {
+        style: 'currency',
+        currency: 'CAD'
+      }).format(value || 0);
+    }
+
+    function formatPercent(value) {
+      return ((value || 0) * 100).toFixed(2) + '%';
+    }
+
+    function calculateProgressiveTax(income, brackets) {
+      let totalTax = 0;
+      const breakdown = [];
+
+      for (const bracket of brackets) {
+        if (income <= bracket.min) continue;
+
+        const taxablePortion = Math.min(income, bracket.max) - bracket.min;
+        const tax = taxablePortion * bracket.rate;
+
+        totalTax += tax;
+
+        breakdown.push({
+          range:
+            bracket.max === Infinity
+              ? `${formatCurrency(bracket.min)} and above`
+              : `${formatCurrency(bracket.min)} to ${formatCurrency(bracket.max)}`,
+          taxablePortion,
+          rate: bracket.rate,
+          tax
+        });
+      }
+
+      return { totalTax, breakdown };
+    }
+
+    function calculateCPP(employmentIncome) {
+      const contributoryEarnings = Math.max(
+        0,
+        Math.min(employmentIncome, PAYROLL_2026.cpp.maxPensionableEarnings) - PAYROLL_2026.cpp.basicExemption
+      );
+
+      const cappedContributoryEarnings = Math.min(
+        contributoryEarnings,
+        PAYROLL_2026.cpp.maxContributoryEarnings
+      );
+
+      const contribution = cappedContributoryEarnings * PAYROLL_2026.cpp.employeeRate;
+
+      return Math.min(contribution, PAYROLL_2026.cpp.maxEmployeeContribution);
+    }
+
+    function calculateEI(employmentIncome) {
+      const insurableEarnings = Math.min(
+        employmentIncome,
+        PAYROLL_2026.ei.maxInsurableEarnings
+      );
+
+      const premium = insurableEarnings * PAYROLL_2026.ei.employeeRate;
+
+      return Math.min(premium, PAYROLL_2026.ei.maxEmployeePremium);
+    }
+
+    function getFederalBasicPersonalAmount(netIncome) {
+      const cfg = CREDITS_2026.federal;
+
+      if (netIncome <= cfg.phaseOutStart) {
+        return cfg.basicPersonalAmountLowIncome;
+      }
+
+      if (netIncome >= cfg.phaseOutEnd) {
+        return cfg.basicPersonalAmountHighIncome;
+      }
+
+      const ratio =
+        (netIncome - cfg.phaseOutStart) / (cfg.phaseOutEnd - cfg.phaseOutStart);
+
+      return cfg.basicPersonalAmountLowIncome -
+        (cfg.basicPersonalAmountLowIncome - cfg.basicPersonalAmountHighIncome) * ratio;
+    }
+
+    function renderTaxBreakdown(tableBodyId, rows) {
+      const tbody = document.getElementById(tableBodyId);
+      tbody.innerHTML = '';
+
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.range}</td>
+          <td>${formatCurrency(row.taxablePortion)}</td>
+          <td>${formatPercent(row.rate)}</td>
+          <td>${formatCurrency(row.tax)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderCreditBreakdown(rows) {
+      const tbody = document.getElementById('creditBreakdown');
+      tbody.innerHTML = '';
+
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.name}</td>
+          <td>${formatCurrency(row.baseAmount)}</td>
+          <td>${formatPercent(row.rate)}</td>
+          <td>${formatCurrency(row.taxReduction)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderPayrollBreakdown(rows) {
+      const tbody = document.getElementById('payrollBreakdown');
+      tbody.innerHTML = '';
+
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.name}</td>
+          <td>${row.basis}</td>
+          <td>${row.rate}</td>
+          <td>${row.amount}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function setText(id, value) {
+      document.getElementById(id).textContent = value;
+    }
+
+    function calculateAll() {
+      const grossIncome = Number(document.getElementById('income').value) || 0;
+      const deductions = Number(document.getElementById('deductions').value) || 0;
+
+      const taxableIncome = Math.max(0, grossIncome - deductions);
+
+      const federalRaw = calculateProgressiveTax(taxableIncome, federalBrackets);
+      const ontarioRaw = calculateProgressiveTax(taxableIncome, ontarioBrackets);
+
+      const cpp = calculateCPP(grossIncome);
+      const ei = calculateEI(grossIncome);
+
+      const federalBPA = getFederalBasicPersonalAmount(taxableIncome);
+      const ontarioBPA = CREDITS_2026.ontario.basicPersonalAmount;
+
+      const federalCreditRows = [
+        {
+          name: 'Federal Basic Personal Amount',
+          baseAmount: federalBPA,
+          rate: CREDITS_2026.federal.lowestRate,
+          taxReduction: federalBPA * CREDITS_2026.federal.lowestRate
+        },
+        {
+          name: 'Federal CPP Credit',
+          baseAmount: cpp,
+          rate: CREDITS_2026.federal.lowestRate,
+          taxReduction: cpp * CREDITS_2026.federal.lowestRate
+        },
+        {
+          name: 'Federal EI Credit',
+          baseAmount: ei,
+          rate: CREDITS_2026.federal.lowestRate,
+          taxReduction: ei * CREDITS_2026.federal.lowestRate
+        }
+      ];
+
+      const ontarioCreditRows = [
+        {
+          name: 'Ontario Basic Personal Amount',
+          baseAmount: ontarioBPA,
+          rate: CREDITS_2026.ontario.lowestRate,
+          taxReduction: ontarioBPA * CREDITS_2026.ontario.lowestRate
+        },
+        {
+          name: 'Ontario CPP Credit',
+          baseAmount: cpp,
+          rate: CREDITS_2026.ontario.lowestRate,
+          taxReduction: cpp * CREDITS_2026.ontario.lowestRate
+        },
+        {
+          name: 'Ontario EI Credit',
+          baseAmount: ei,
+          rate: CREDITS_2026.ontario.lowestRate,
+          taxReduction: ei * CREDITS_2026.ontario.lowestRate
+        }
+      ];
+
+      const federalCreditsTotal = federalCreditRows.reduce((sum, row) => sum + row.taxReduction, 0);
+      const ontarioCreditsTotal = ontarioCreditRows.reduce((sum, row) => sum + row.taxReduction, 0);
+
+      const federalTax = Math.max(0, federalRaw.totalTax - federalCreditsTotal);
+      const ontarioTax = Math.max(0, ontarioRaw.totalTax - ontarioCreditsTotal);
+
+      const totalDeductions = federalTax + ontarioTax + cpp + ei;
+      const netAnnual = grossIncome - totalDeductions;
+      const netMonthly = netAnnual / 12;
+      const netBiweekly = netAnnual / 26;
+
+      const federalEffectiveRate = grossIncome > 0 ? federalTax / grossIncome : 0;
+      const totalEffectiveRate = grossIncome > 0 ? totalDeductions / grossIncome : 0;
+
+      setText('grossIncome', formatCurrency(grossIncome));
+      setText('taxableIncome', formatCurrency(taxableIncome));
+      setText('federalTaxBeforeCredits', formatCurrency(federalRaw.totalTax));
+      setText('federalTax', formatCurrency(federalTax));
+      setText('ontarioTaxBeforeCredits', formatCurrency(ontarioRaw.totalTax));
+      setText('ontarioTax', formatCurrency(ontarioTax));
+      setText('cppAmount', formatCurrency(cpp));
+      setText('eiAmount', formatCurrency(ei));
+      setText('totalDeductions', formatCurrency(totalDeductions));
+      setText('netAnnual', formatCurrency(netAnnual));
+      setText('netMonthly', formatCurrency(netMonthly));
+      setText('netBiweekly', formatCurrency(netBiweekly));
+      setText('federalRate', formatPercent(federalEffectiveRate));
+      setText('effectiveRate', formatPercent(totalEffectiveRate));
+
+      renderTaxBreakdown('federalBreakdown', federalRaw.breakdown);
+      renderTaxBreakdown('ontarioBreakdown', ontarioRaw.breakdown);
+
+      renderCreditBreakdown([
+        ...federalCreditRows,
+        ...ontarioCreditRows
+      ]);
+
+      const cppBasis = Math.min(
+        Math.max(0, grossIncome - PAYROLL_2026.cpp.basicExemption),
+        PAYROLL_2026.cpp.maxContributoryEarnings
+      );
+
+      const eiBasis = Math.min(grossIncome, PAYROLL_2026.ei.maxInsurableEarnings);
+
+      renderPayrollBreakdown([
+        {
+          name: 'CPP',
+          basis: `${formatCurrency(cppBasis)} contributory earnings`,
+          rate: formatPercent(PAYROLL_2026.cpp.employeeRate),
+          amount: formatCurrency(cpp)
+        },
+        {
+          name: 'EI',
+          basis: `${formatCurrency(eiBasis)} insurable earnings`,
+          rate: formatPercent(PAYROLL_2026.ei.employeeRate),
+          amount: formatCurrency(ei)
+        }
+      ]);
+
+      document.getElementById('result').style.display = 'block';
+    }
+
+    calculateAll();
+  </script>
+</body>
+</html>

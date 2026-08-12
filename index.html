@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ontario Retirement Planning Tool</title>
+  <style>
+    :root {
+      --bg: #eef2f6;
+      --bg-accent: #e4ebf3;
+      --surface: #ffffff;
+      --ink: #1a2332;
+      --muted: #5c6b7a;
+      --line: #d3dce8;
+      --line-soft: #e8eef5;
+      --brand: #0b5f8a;
+      --brand-dark: #084866;
+      --brand-soft: #e8f3f8;
+      --accent: #1a7a5c;
+      --accent-soft: #e8f6f1;
+      --warn: #9a5b14;
+      --warn-soft: #fff4e6;
+      --danger: #9b2c2c;
+      --shadow: 0 1px 2px rgba(26, 35, 50, 0.04), 0 8px 24px rgba(26, 35, 50, 0.06);
+      --radius: 12px;
+      --font: "Segoe UI", "Helvetica Neue", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background:
+        radial-gradient(1200px 600px at 10% -10%, #d9e8f2 0%, transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, #dcefe7 0%, transparent 50%),
+        var(--bg);
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: clamp(1.55rem, 2.4vw, 2rem);
+      letter-spacing: -0.02em;
+      color: var(--brand-dark);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 56ch;
+      line-height: 1.45;
+      font-size: 0.95rem;
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    a.chip-link {
+      text-decoration: none;
+      color: var(--brand-dark);
+      font-weight: 600;
+      transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    a.chip-link:hover {
+      background: var(--brand-soft);
+      border-color: #c5dde9;
+      color: var(--brand);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 6px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      backdrop-filter: blur(8px);
+      margin-bottom: 18px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      appearance: none;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-weight: 600;
+      font-size: 0.92rem;
+      padding: 12px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .tab-btn:hover { background: var(--bg-accent); color: var(--ink); }
+
+    .tab-btn.active {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .tab-btn .step {
+      display: inline-block;
+      width: 1.35em;
+      height: 1.35em;
+      line-height: 1.35em;
+      text-align: center;
+      border-radius: 50%;
+      font-size: 0.75rem;
+      margin-right: 6px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .tab-btn:not(.active) .step {
+      background: var(--line-soft);
+      color: var(--muted);
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(300px, 380px) 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .layout.single { grid-template-columns: 1fr; }
+
+    .stack { display: grid; gap: 14px; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .card h2 {
+      margin: 0 0 4px;
+      font-size: 1.05rem;
+    }
+
+    .card .sub {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .field-group {
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #fafcfe;
+    }
+
+    .field-group:last-child { margin-bottom: 0; }
+
+    .field-group summary,
+    .group-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--brand);
+      margin-bottom: 10px;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .field-group summary::-webkit-details-marker { display: none; }
+    .field-group summary::after {
+      content: "▾";
+      float: right;
+      color: var(--muted);
+    }
+    .field-group:not([open]) summary::after { content: "▸"; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 12px;
+    }
+
+    .grid.one { grid-template-columns: 1fr; }
+    .grid.three { grid-template-columns: repeat(3, 1fr); }
+    .span-2 { grid-column: span 2; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font: inherit;
+      font-size: 14px;
+      color: var(--ink);
+      background: #fff;
+    }
+
+    input[type="number"]:focus {
+      outline: 2px solid rgba(11, 95, 138, 0.25);
+      border-color: var(--brand);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    button.primary, button.secondary {
+      appearance: none;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font: inherit;
+      font-weight: 650;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--brand);
+      color: #fff;
+    }
+    button.primary:hover { background: var(--brand-dark); }
+
+    button.secondary {
+      background: var(--brand-soft);
+      color: var(--brand-dark);
+      border: 1px solid #c5dde9;
+    }
+    button.secondary:hover { background: #d8ecf4; }
+
+    .note {
+      background: var(--brand-soft);
+      border: 1px solid #c5dde9;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--ink);
+    }
+
+    .note ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .kpi {
+      background: linear-gradient(180deg, #fff, #f7fafc);
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .kpi.highlight {
+      background: linear-gradient(180deg, #f0faf6, #e8f6f1);
+      border-color: #b9e0d0;
+    }
+
+    .kpi.alert {
+      background: linear-gradient(180deg, #fff8ef, #fff4e6);
+      border-color: #f0d3a8;
+    }
+
+    .kpi .label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .kpi .value {
+      font-size: 1.15rem;
+      font-weight: 750;
+      letter-spacing: -0.01em;
+    }
+
+    .kpi .hint {
+      margin-top: 4px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .bridge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--accent-soft);
+      border: 1px solid #b9e0d0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      font-size: 13px;
+    }
+
+    .bridge strong { color: var(--accent); }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 560px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line-soft);
+      border-right: 1px solid var(--line-soft);
+      padding: 7px 9px;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f0f5fa;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    td:first-child, th:first-child,
+    td:nth-child(2), th:nth-child(2) {
+      text-align: center;
+    }
+
+    tr:hover td { background: #f8fbfd; }
+
+    .muted { color: var(--muted); font-size: 12px; }
+
+    details.breakdown {
+      margin-top: 12px;
+      border: 1px solid var(--line-soft);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #fafcfe;
+    }
+
+    details.breakdown summary {
+      cursor: pointer;
+      font-weight: 650;
+      font-size: 0.9rem;
+      color: var(--brand-dark);
+    }
+
+    details.breakdown .inner { margin-top: 10px; }
+
+    .sticky-side {
+      position: sticky;
+      top: 14px;
+    }
+
+    @media (max-width: 960px) {
+      .layout { grid-template-columns: 1fr; }
+      .sticky-side { position: static; }
+      .grid.three { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .grid, .grid.three { grid-template-columns: 1fr; }
+      .span-2 { grid-column: span 1; }
+      .app { padding: 18px 14px 36px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div>
+        <h1>Ontario Retirement Planning Tool</h1>
+        <p>
+          Estimate Ontario take-home pay, project wealth through working years, then stress-test retirement spending — all in one place.
+        </p>
+      </div>
+      <div class="hero-meta">
+        <a class="chip chip-link" href="https://xavierzhang21.github.io/Fintech_PM/" target="_blank" rel="noopener noreferrer">
+          Designed by Xavier Jiang
+        </a>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Planning stages">
+      <button class="tab-btn active" role="tab" aria-selected="true" data-tab="income" id="tab-income">
+        <span class="step">1</span>Income
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="accumulation" id="tab-accumulation">
+        <span class="step">2</span>Wealth Accumulation
+      </button>
+      <button class="tab-btn" role="tab" aria-selected="false" data-tab="retirement" id="tab-retirement">
+        <span class="step">3</span>Retirement Spending
+      </button>
+    </nav>
+
+    <!-- TAB 1: Income -->
+    <section class="panel active" id="panel-income" role="tabpanel">
+      <div class="layout">
+        <aside class="stack sticky-side">
+          <div class="card">
+            <h2>Salary inputs</h2>
+            <p class="sub">Used for net pay here and as starting income in wealth accumulation.</p>
+
+            <div class="field-group">
+              <div class="group-title">Employment income</div>
+              <div class="grid one">
+                <div>
+                  <label for="income">Annual salary ($)</label>
+                  <input type="number" id="income" value="120000" min="0" step="100" />
+                </div>
+                <div>
+                  <label for="deductions">Tax deductions ($)</label>
+                  <input type="number" id="deductions" value="0" min="0" step="100" />
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="primary" type="button" onclick="calculateIncome()">Calculate net income</button>
+              <button class="secondary" type="button" onclick="useIncomeInPlan()">Use in plan →</button>
+            </div>
+          </div>
+
+          <div class="note">
+            Includes 2026 federal &amp; Ontario brackets, CPP, EI, and basic personal amount credits (federal + Ontario, including CPP/EI credits).
+            Does not include Ontario surtax, health premium, or CPP2.
+          </div>
+        </aside>
+
+        <div class="stack">
+          <div class="card">
+            <h2>Take-home summary</h2>
+            <p class="sub">Net income = gross − federal tax − Ontario tax − CPP − EI (after credits).</p>
+            <div class="kpi-grid" id="incomeKpis"></div>
+          </div>
+
+          <div class="card">
+            <h2>Deduction detail</h2>
+            <div class="kpi-grid" id="deductionKpis"></div>
+
+            <details class="breakdown">
+              <summary>Federal tax brackets</summary>
+              <div class="inner table-wrap" style="max-height: 280px;">
+                <table>
+                  <thead>
+                    <tr><th>Bracket</th><th>Taxable portion</th><th>Rate</th><th>Tax</th></tr>
+                  </thead>
+                  <tbody id="federalBreakdown"></tbody>
+                </table>
+              </div>
+            </details>
+
+            <details class="breakdown">
+              <summary>Ontario tax brackets</summary>
+              <div class="inner table-wrap" style="max-height: 280px;">
+                <table>
+                  <thead>
+                    <tr><th>Bracket</th><th>Taxable portion</th><th>Rate</th><th>Tax</th></tr>
+                  </thead>
+                  <tbody id="ontarioBreakdown"></tbody>
+                </table>
+              </div>
+            </details>
+
+            <details class="breakdown">
+              <summary>Tax credits</summary>
+              <div class="inner table-wrap" style="max-height: 280px;">
+                <table>
+                  <thead>
+                    <tr><th>Credit</th><th>Base amount</th><th>Rate</th><th>Reduction</th></tr>
+                  </thead>
+                  <tbody id="creditBreakdown"></tbody>
+                </table>
+              </div>
+            </details>
+
+            <details class="breakdown">
+              <summary>Payroll contributions</summary>
+              <div class="inner table-wrap" style="max-height: 200px;">
+                <table>
+                  <thead>
+                    <tr><th>Component</th><th>Basis</th><th>Rate</th><th>Amount</th></tr>
+                  </thead>
+                  <tbody id="payrollBreakdown"></tbody>
+                </table>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: Wealth Accumulation -->
+    <section class="panel" id="panel-accumulation" role="tabpanel">
+      <div class="bridge" id="incomeBridge">
+        <div>
+          Linked net-pay engine from the Income tab.
+          Starting before-tax income: <strong id="bridgeIncome">—</strong>
+          · Estimated first-year net: <strong id="bridgeNet">—</strong>
+        </div>
+        <button class="secondary" type="button" onclick="showTab('income')">Edit income assumptions</button>
+      </div>
+
+      <div class="layout">
+        <aside class="stack sticky-side">
+          <div class="card">
+            <h2>Plan inputs</h2>
+            <p class="sub">Grouped by decision area. Changes recalculate when you click Calculate.</p>
+
+            <details class="field-group" open>
+              <summary>Timeline</summary>
+              <div class="grid">
+                <div>
+                  <label for="startYear">Start year</label>
+                  <input id="startYear" type="number" value="2025" />
+                </div>
+                <div>
+                  <label for="startAge">Start age</label>
+                  <input id="startAge" type="number" value="35" />
+                </div>
+                <div>
+                  <label for="retireAge">Retirement age</label>
+                  <input id="retireAge" type="number" value="65" />
+                </div>
+                <div>
+                  <label for="endAge">Projection end age</label>
+                  <input id="endAge" type="number" value="95" />
+                </div>
+              </div>
+            </details>
+
+            <details class="field-group" open>
+              <summary>Income &amp; living costs</summary>
+              <div class="grid">
+                <div class="span-2">
+                  <label for="income0">Starting before-tax income ($)</label>
+                  <input id="income0" type="number" step="0.01" value="120000" />
+                </div>
+                <div>
+                  <label for="incomeGrowth">Income growth (%/yr)</label>
+                  <input id="incomeGrowth" type="number" step="0.01" value="3.00" />
+                </div>
+                <div>
+                  <label for="inflation">Inflation (%/yr)</label>
+                  <input id="inflation" type="number" step="0.01" value="2.50" />
+                </div>
+                <div>
+                  <label for="housing0">Starting housing costs ($)</label>
+                  <input id="housing0" type="number" step="0.01" value="30000" />
+                </div>
+                <div>
+                  <label for="other0">Starting other costs ($)</label>
+                  <input id="other0" type="number" step="0.01" value="20000" />
+                </div>
+              </div>
+            </details>
+
+            <details class="field-group" open>
+              <summary>Starting balances</summary>
+              <div class="grid">
+                <div>
+                  <label for="rrsp0">RRSP ($)</label>
+                  <input id="rrsp0" type="number" step="0.01" value="100000" />
+                </div>
+                <div>
+                  <label for="tfsa0">TFSA ($)</label>
+                  <input id="tfsa0" type="number" step="0.01" value="80000" />
+                </div>
+                <div class="span-2">
+                  <label for="nonReg0">Non-registered ($)</label>
+                  <input id="nonReg0" type="number" step="0.01" value="50000" />
+                </div>
+              </div>
+            </details>
+
+            <details class="field-group">
+              <summary>Returns before retirement</summary>
+              <div class="grid">
+                <div>
+                  <label for="rrspReturn">RRSP return (%)</label>
+                  <input id="rrspReturn" type="number" step="0.01" value="6.00" />
+                </div>
+                <div>
+                  <label for="tfsaReturn">TFSA return (%)</label>
+                  <input id="tfsaReturn" type="number" step="0.01" value="6.00" />
+                </div>
+                <div class="span-2">
+                  <label for="nonRegReturn">Non-reg return (%)</label>
+                  <input id="nonRegReturn" type="number" step="0.01" value="5.00" />
+                </div>
+              </div>
+            </details>
+
+            <details class="field-group">
+              <summary>Retirement assumptions (for Tab 3)</summary>
+              <div class="grid">
+                <div>
+                  <label for="retInflation">Retirement inflation (%)</label>
+                  <input id="retInflation" type="number" step="0.01" value="2.50" />
+                </div>
+                <div>
+                  <label for="retWithdraw0">Withdrawal at retirement ($)</label>
+                  <input id="retWithdraw0" type="number" step="0.01" value="70000" />
+                </div>
+                <div>
+                  <label for="retRrspReturn">RRSP return (%)</label>
+                  <input id="retRrspReturn" type="number" step="0.01" value="4.00" />
+                </div>
+                <div>
+                  <label for="retTfsaReturn">TFSA return (%)</label>
+                  <input id="retTfsaReturn" type="number" step="0.01" value="4.00" />
+                </div>
+                <div class="span-2">
+                  <label for="retNonRegReturn">Non-reg return (%)</label>
+                  <input id="retNonRegReturn" type="number" step="0.01" value="4.00" />
+                </div>
+              </div>
+            </details>
+
+            <div class="actions">
+              <button class="primary" type="button" onclick="runPlan()">Calculate plan</button>
+              <button class="secondary" type="button" onclick="showTab('retirement')">View retirement →</button>
+            </div>
+            <p class="muted" style="margin-top:10px;">
+              Present values are in 2025 dollars (inflation-discounted). After-tax income uses the Income tab’s Ontario net-pay logic each year.
+            </p>
+          </div>
+        </aside>
+
+        <div class="stack">
+          <div class="card">
+            <h2>Accumulation summary</h2>
+            <div class="kpi-grid" id="accSummary"></div>
+          </div>
+
+          <div class="card">
+            <h2>Year-by-year accumulation</h2>
+            <p class="sub">TFSA contribution uses annual limit; RRSP contribution is min(remaining investable after TFSA, 18% of income).</p>
+            <div class="table-wrap">
+              <table id="accTable"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Retirement Spending -->
+    <section class="panel" id="panel-retirement" role="tabpanel">
+      <div class="bridge">
+        <div>
+          Withdrawals draw RRSP → Non-reg → TFSA. Opening balances come from the last accumulation year.
+          <span id="retBridgeDetail"></span>
+        </div>
+        <button class="secondary" type="button" onclick="showTab('accumulation')">← Adjust accumulation</button>
+      </div>
+
+      <div class="layout single">
+        <div class="stack">
+          <div class="card">
+            <h2>Retirement outcome</h2>
+            <div class="kpi-grid" id="retSummary"></div>
+          </div>
+
+          <div class="card">
+            <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; justify-content:space-between;">
+              <div>
+                <h2 style="margin:0 0 4px;">Spending schedule</h2>
+                <p class="sub" style="margin:0;">Withdrawal grows with retirement inflation each year.</p>
+              </div>
+              <div class="actions" style="margin:0;">
+                <button class="primary" type="button" onclick="runPlan()">Recalculate</button>
+              </div>
+            </div>
+
+            <div class="field-group" style="margin-top:14px;">
+              <div class="group-title">Quick edit retirement draws</div>
+              <div class="grid three">
+                <div>
+                  <label for="retWithdraw0_sync">Annual withdrawal at start ($)</label>
+                  <input id="retWithdraw0_sync" type="number" step="0.01" />
+                </div>
+                <div>
+                  <label for="retInflation_sync">Retirement inflation (%)</label>
+                  <input id="retInflation_sync" type="number" step="0.01" />
+                </div>
+                <div>
+                  <label for="endAge_sync">End age</label>
+                  <input id="endAge_sync" type="number" />
+                </div>
+              </div>
+              <div class="actions">
+                <button class="secondary" type="button" onclick="syncRetirementFieldsFromTab(); runPlan();">Apply &amp; recalculate</button>
+              </div>
+            </div>
+
+            <div class="table-wrap" style="margin-top:14px;">
+              <table id="retTable"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    /* ========== Shared formatting ========== */
+    function formatCurrency(value, digits = 0) {
+      return new Intl.NumberFormat('en-CA', {
+        style: 'currency',
+        currency: 'CAD',
+        maximumFractionDigits: digits,
+        minimumFractionDigits: digits
+      }).format(value || 0);
+    }
+
+    function formatPercent(value) {
+      return ((value || 0) * 100).toFixed(2) + '%';
+    }
+
+    function pct(v) { return Number(v) / 100; }
+    function val(id) { return parseFloat(document.getElementById(id).value || 0); }
+    function safe(n) { return isFinite(n) ? n : 0; }
+
+    function pv(futureValue, inflationRate, yearsFromBase) {
+      return futureValue / Math.pow(1 + inflationRate, yearsFromBase);
+    }
+
+    /* ========== 2026 Ontario net income engine (from tax.html) ========== */
+    const PAYROLL_2026 = {
+      cpp: {
+        maxPensionableEarnings: 74600,
+        basicExemption: 3500,
+        maxContributoryEarnings: 71100,
+        employeeRate: 0.0595,
+        maxEmployeeContribution: 4230.45
+      },
+      ei: {
+        maxInsurableEarnings: 68900,
+        employeeRate: 0.0163,
+        maxEmployeePremium: 1123.07
+      }
+    };
+
+    const CREDITS_2026 = {
+      federal: {
+        lowestRate: 0.14,
+        basicPersonalAmountLowIncome: 16452,
+        basicPersonalAmountHighIncome: 14829,
+        phaseOutStart: 181440,
+        phaseOutEnd: 258482
+      },
+      ontario: {
+        lowestRate: 0.0505,
+        basicPersonalAmount: 12989
+      }
+    };
+
+    const federalBrackets = [
+      { min: 0, max: 58523, rate: 0.14 },
+      { min: 58523, max: 117045, rate: 0.205 },
+      { min: 117045, max: 181440, rate: 0.26 },
+      { min: 181440, max: 258482, rate: 0.29 },
+      { min: 258482, max: Infinity, rate: 0.33 }
+    ];
+
+    const ontarioBrackets = [
+      { min: 0, max: 53891, rate: 0.0505 },
+      { min: 53891, max: 107785, rate: 0.0915 },
+      { min: 107785, max: 150000, rate: 0.1116 },
+      { min: 150000, max: 220000, rate: 0.1216 },
+      { min: 220000, max: Infinity, rate: 0.1316 }
+    ];
+
+    function calculateProgressiveTax(income, brackets) {
+      let totalTax = 0;
+      const breakdown = [];
+
+      for (const bracket of brackets) {
+        if (income <= bracket.min) continue;
+        const taxablePortion = Math.min(income, bracket.max) - bracket.min;
+        const tax = taxablePortion * bracket.rate;
+        totalTax += tax;
+        breakdown.push({
+          range: bracket.max === Infinity
+            ? `${formatCurrency(bracket.min)} and above`
+            : `${formatCurrency(bracket.min)} to ${formatCurrency(bracket.max)}`,
+          taxablePortion,
+          rate: bracket.rate,
+          tax
+        });
+      }
+      return { totalTax, breakdown };
+    }
+
+    function calculateCPP(employmentIncome) {
+      const contributoryEarnings = Math.max(
+        0,
+        Math.min(employmentIncome, PAYROLL_2026.cpp.maxPensionableEarnings) - PAYROLL_2026.cpp.basicExemption
+      );
+      const cappedContributoryEarnings = Math.min(
+        contributoryEarnings,
+        PAYROLL_2026.cpp.maxContributoryEarnings
+      );
+      const contribution = cappedContributoryEarnings * PAYROLL_2026.cpp.employeeRate;
+      return Math.min(contribution, PAYROLL_2026.cpp.maxEmployeeContribution);
+    }
+
+    function calculateEI(employmentIncome) {
+      const insurableEarnings = Math.min(employmentIncome, PAYROLL_2026.ei.maxInsurableEarnings);
+      const premium = insurableEarnings * PAYROLL_2026.ei.employeeRate;
+      return Math.min(premium, PAYROLL_2026.ei.maxEmployeePremium);
+    }
+
+    function getFederalBasicPersonalAmount(netIncome) {
+      const cfg = CREDITS_2026.federal;
+      if (netIncome <= cfg.phaseOutStart) return cfg.basicPersonalAmountLowIncome;
+      if (netIncome >= cfg.phaseOutEnd) return cfg.basicPersonalAmountHighIncome;
+      const ratio = (netIncome - cfg.phaseOutStart) / (cfg.phaseOutEnd - cfg.phaseOutStart);
+      return cfg.basicPersonalAmountLowIncome -
+        (cfg.basicPersonalAmountLowIncome - cfg.basicPersonalAmountHighIncome) * ratio;
+    }
+
+    /** Full Ontario net-income calculation — shared by Income tab and accumulation. */
+    function computeNetIncome(grossIncome, deductions = 0) {
+      const taxableIncome = Math.max(0, grossIncome - deductions);
+      const federalRaw = calculateProgressiveTax(taxableIncome, federalBrackets);
+      const ontarioRaw = calculateProgressiveTax(taxableIncome, ontarioBrackets);
+      const cpp = calculateCPP(grossIncome);
+      const ei = calculateEI(grossIncome);
+
+      const federalBPA = getFederalBasicPersonalAmount(taxableIncome);
+      const ontarioBPA = CREDITS_2026.ontario.basicPersonalAmount;
+
+      const federalCreditRows = [
+        { name: 'Federal Basic Personal Amount', baseAmount: federalBPA, rate: CREDITS_2026.federal.lowestRate, taxReduction: federalBPA * CREDITS_2026.federal.lowestRate },
+        { name: 'Federal CPP Credit', baseAmount: cpp, rate: CREDITS_2026.federal.lowestRate, taxReduction: cpp * CREDITS_2026.federal.lowestRate },
+        { name: 'Federal EI Credit', baseAmount: ei, rate: CREDITS_2026.federal.lowestRate, taxReduction: ei * CREDITS_2026.federal.lowestRate }
+      ];
+
+      const ontarioCreditRows = [
+        { name: 'Ontario Basic Personal Amount', baseAmount: ontarioBPA, rate: CREDITS_2026.ontario.lowestRate, taxReduction: ontarioBPA * CREDITS_2026.ontario.lowestRate },
+        { name: 'Ontario CPP Credit', baseAmount: cpp, rate: CREDITS_2026.ontario.lowestRate, taxReduction: cpp * CREDITS_2026.ontario.lowestRate },
+        { name: 'Ontario EI Credit', baseAmount: ei, rate: CREDITS_2026.ontario.lowestRate, taxReduction: ei * CREDITS_2026.ontario.lowestRate }
+      ];
+
+      const federalCreditsTotal = federalCreditRows.reduce((s, r) => s + r.taxReduction, 0);
+      const ontarioCreditsTotal = ontarioCreditRows.reduce((s, r) => s + r.taxReduction, 0);
+      const federalTax = Math.max(0, federalRaw.totalTax - federalCreditsTotal);
+      const ontarioTax = Math.max(0, ontarioRaw.totalTax - ontarioCreditsTotal);
+      const totalDeductions = federalTax + ontarioTax + cpp + ei;
+      const netAnnual = grossIncome - totalDeductions;
+
+      return {
+        grossIncome,
+        deductions,
+        taxableIncome,
+        federalRaw,
+        ontarioRaw,
+        federalTax,
+        ontarioTax,
+        cpp,
+        ei,
+        totalDeductions,
+        netAnnual,
+        netMonthly: netAnnual / 12,
+        netBiweekly: netAnnual / 26,
+        federalEffectiveRate: grossIncome > 0 ? federalTax / grossIncome : 0,
+        totalEffectiveRate: grossIncome > 0 ? totalDeductions / grossIncome : 0,
+        federalCreditRows,
+        ontarioCreditRows
+      };
+    }
+
+    function afterTaxIncome(beforeTax, deductions = 0) {
+      return computeNetIncome(beforeTax, deductions).netAnnual;
+    }
+
+    /* ========== Tabs ========== */
+    function showTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        const on = btn.dataset.tab === name;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('.panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === 'panel-' + name);
+      });
+      if (name === 'retirement') syncRetirementFieldsToTab();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => showTab(btn.dataset.tab));
+    });
+
+    /* ========== Income tab UI ========== */
+    function renderTaxBreakdown(tableBodyId, rows) {
+      const tbody = document.getElementById(tableBodyId);
+      tbody.innerHTML = '';
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="text-align:left">${row.range}</td>
+          <td>${formatCurrency(row.taxablePortion)}</td>
+          <td>${formatPercent(row.rate)}</td>
+          <td>${formatCurrency(row.tax)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderCreditBreakdown(rows) {
+      const tbody = document.getElementById('creditBreakdown');
+      tbody.innerHTML = '';
+      rows.forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="text-align:left">${row.name}</td>
+          <td>${formatCurrency(row.baseAmount)}</td>
+          <td>${formatPercent(row.rate)}</td>
+          <td>${formatCurrency(row.taxReduction)}</td>`;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderPayrollBreakdown(result) {
+      const cppBasis = Math.min(
+        Math.max(0, result.grossIncome - PAYROLL_2026.cpp.basicExemption),
+        PAYROLL_2026.cpp.maxContributoryEarnings
+      );
+      const eiBasis = Math.min(result.grossIncome, PAYROLL_2026.ei.maxInsurableEarnings);
+      const tbody = document.getElementById('payrollBreakdown');
+      tbody.innerHTML = `
+        <tr>
+          <td style="text-align:left">CPP</td>
+          <td style="text-align:left">${formatCurrency(cppBasis)} contributory earnings</td>
+          <td>${formatPercent(PAYROLL_2026.cpp.employeeRate)}</td>
+          <td>${formatCurrency(result.cpp)}</td>
+        </tr>
+        <tr>
+          <td style="text-align:left">EI</td>
+          <td style="text-align:left">${formatCurrency(eiBasis)} insurable earnings</td>
+          <td>${formatPercent(PAYROLL_2026.ei.employeeRate)}</td>
+          <td>${formatCurrency(result.ei)}</td>
+        </tr>`;
+    }
+
+    function kpi(label, value, opts = {}) {
+      const cls = opts.highlight ? ' highlight' : opts.alert ? ' alert' : '';
+      const hint = opts.hint ? `<div class="hint">${opts.hint}</div>` : '';
+      return `<div class="kpi${cls}"><div class="label">${label}</div><div class="value">${value}</div>${hint}</div>`;
+    }
+
+    let lastIncomeResult = null;
+
+    function calculateIncome() {
+      const result = computeNetIncome(val('income'), val('deductions'));
+      lastIncomeResult = result;
+
+      document.getElementById('incomeKpis').innerHTML = [
+        kpi('Gross annual', formatCurrency(result.grossIncome), { hint: 'Before deductions' }),
+        kpi('Taxable income', formatCurrency(result.taxableIncome)),
+        kpi('Net annual', formatCurrency(result.netAnnual), { highlight: true }),
+        kpi('Net monthly', formatCurrency(result.netMonthly), { highlight: true }),
+        kpi('Net biweekly', formatCurrency(result.netBiweekly)),
+        kpi('Effective deduction rate', formatPercent(result.totalEffectiveRate), { alert: true })
+      ].join('');
+
+      document.getElementById('deductionKpis').innerHTML = [
+        kpi('Federal tax (after credits)', formatCurrency(result.federalTax)),
+        kpi('Ontario tax (after credits)', formatCurrency(result.ontarioTax)),
+        kpi('CPP', formatCurrency(result.cpp)),
+        kpi('EI', formatCurrency(result.ei)),
+        kpi('Total deductions', formatCurrency(result.totalDeductions), { alert: true }),
+        kpi('Federal effective rate', formatPercent(result.federalEffectiveRate))
+      ].join('');
+
+      renderTaxBreakdown('federalBreakdown', result.federalRaw.breakdown);
+      renderTaxBreakdown('ontarioBreakdown', result.ontarioRaw.breakdown);
+      renderCreditBreakdown([...result.federalCreditRows, ...result.ontarioCreditRows]);
+      renderPayrollBreakdown(result);
+
+      document.getElementById('bridgeIncome').textContent = formatCurrency(result.grossIncome);
+      document.getElementById('bridgeNet').textContent = formatCurrency(result.netAnnual);
+    }
+
+    function useIncomeInPlan() {
+      document.getElementById('income0').value = val('income');
+      calculateIncome();
+      runPlan();
+      showTab('accumulation');
+    }
+
+    /* ========== Accumulation + retirement (from calc.html, with net-income engine) ========== */
+    function tfsaLimit(year) {
+      return 7000 + Math.floor((year - 2025) / 5) * 500;
+    }
+
+    function readPlanInputs() {
+      return {
+        startYear: val('startYear'),
+        startAge: val('startAge'),
+        retireAge: val('retireAge'),
+        endAge: val('endAge'),
+        inflation: pct(val('inflation')),
+        incomeGrowth: pct(val('incomeGrowth')),
+        rrspReturn: pct(val('rrspReturn')),
+        tfsaReturn: pct(val('tfsaReturn')),
+        nonRegReturn: pct(val('nonRegReturn')),
+        income0: val('income0'),
+        housing0: val('housing0'),
+        other0: val('other0'),
+        nonReg0: val('nonReg0'),
+        tfsa0: val('tfsa0'),
+        rrsp0: val('rrsp0'),
+        retInflation: pct(val('retInflation')),
+        retNonRegReturn: pct(val('retNonRegReturn')),
+        retRrspReturn: pct(val('retRrspReturn')),
+        retTfsaReturn: pct(val('retTfsaReturn')),
+        retWithdraw0: val('retWithdraw0'),
+        taxDeductions: val('deductions')
+      };
+    }
+
+    function buildAccumulation(inputs) {
+      const rows = [];
+      const years = inputs.retireAge - inputs.startAge + 1;
+      let income = inputs.income0;
+      let housing = inputs.housing0;
+      let other = inputs.other0;
+      let nonRegStart = inputs.nonReg0;
+      let tfsaStart = inputs.tfsa0;
+      let rrspStart = inputs.rrsp0;
+
+      for (let i = 0; i < years; i++) {
+        const year = inputs.startYear + i;
+        const age = inputs.startAge + i;
+
+        if (i > 0) {
+          income *= (1 + inputs.incomeGrowth);
+          housing *= (1 + inputs.inflation);
+          other *= (1 + inputs.inflation);
+        }
+
+        const afterTax = afterTaxIncome(income, inputs.taxDeductions);
+        const investableIncome = afterTax - housing - other;
+        const tfsaContrib = tfsaLimit(year);
+        const rrspMax = income * 0.18;
+        const rrspContrib = Math.min(Math.max(investableIncome - tfsaContrib, 0), rrspMax);
+        const afterContributions = afterTax - housing - other - tfsaContrib - rrspContrib;
+
+        const nonRegEnd = Math.max(0, nonRegStart * (1 + inputs.nonRegReturn) + Math.max(afterContributions, 0));
+        const tfsaEnd = Math.max(0, tfsaStart * (1 + inputs.tfsaReturn) + Math.max(tfsaContrib, 0));
+        const rrspEnd = Math.max(0, rrspStart * (1 + inputs.rrspReturn) + Math.max(rrspContrib, 0));
+        const totalWealth = nonRegEnd + tfsaEnd + rrspEnd;
+        const yearsFrom2025 = year - 2025;
+
+        rows.push({
+          year, age,
+          beforeTaxIncome: safe(income),
+          afterTaxIncome: safe(afterTax),
+          afterTaxIncomePV: safe(pv(afterTax, inputs.inflation, yearsFrom2025)),
+          housingCosts: safe(housing),
+          housingCostsPV: safe(pv(housing, inputs.inflation, yearsFrom2025)),
+          otherCosts: safe(other),
+          otherCostsPV: safe(pv(other, inputs.inflation, yearsFrom2025)),
+          investableIncome: safe(investableIncome),
+          investableIncomePV: safe(pv(investableIncome, inputs.inflation, yearsFrom2025)),
+          tfsaContribution: safe(tfsaContrib),
+          rrspContribution: safe(rrspContrib),
+          afterContributions: safe(afterContributions),
+          nonRegStart: safe(nonRegStart),
+          nonRegEnd: safe(nonRegEnd),
+          nonRegEndPV: safe(pv(nonRegEnd, inputs.inflation, yearsFrom2025)),
+          tfsaStart: safe(tfsaStart),
+          tfsaEnd: safe(tfsaEnd),
+          tfsaEndPV: safe(pv(tfsaEnd, inputs.inflation, yearsFrom2025)),
+          rrspStart: safe(rrspStart),
+          rrspEnd: safe(rrspEnd),
+          rrspEndPV: safe(pv(rrspEnd, inputs.inflation, yearsFrom2025)),
+          totalWealth: safe(totalWealth),
+          totalWealthPV: safe(pv(totalWealth, inputs.inflation, yearsFrom2025))
+        });
+
+        nonRegStart = nonRegEnd;
+        tfsaStart = tfsaEnd;
+        rrspStart = rrspEnd;
+      }
+      return rows;
+    }
+
+    function buildRetirement(inputs, retirementStart) {
+      const rows = [];
+      const years = inputs.endAge - inputs.retireAge + 1;
+      let rrspOpen = retirementStart.rrspEnd;
+      let nonRegOpen = retirementStart.nonRegEnd;
+      let tfsaOpen = retirementStart.tfsaEnd;
+
+      for (let i = 0; i < years; i++) {
+        const year = retirementStart.year + i;
+        const age = retirementStart.age + i;
+        const withdrawalRequired = inputs.retWithdraw0 * Math.pow(1 + inputs.retInflation, i);
+        let remainingNeed = withdrawalRequired;
+
+        const rrspGrowthBase = rrspOpen * (1 + inputs.retRrspReturn);
+        const rrspWithdrawal = Math.min(remainingNeed, rrspGrowthBase);
+        const rrspEnd = Math.max(0, rrspGrowthBase - rrspWithdrawal);
+        remainingNeed -= rrspWithdrawal;
+
+        const nonRegGrowthBase = nonRegOpen * (1 + inputs.retNonRegReturn);
+        const nonRegWithdrawal = Math.min(remainingNeed, nonRegGrowthBase);
+        const nonRegEnd = Math.max(0, nonRegGrowthBase - nonRegWithdrawal);
+        remainingNeed -= nonRegWithdrawal;
+
+        const tfsaGrowthBase = tfsaOpen * (1 + inputs.retTfsaReturn);
+        const tfsaWithdrawal = Math.min(remainingNeed, tfsaGrowthBase);
+        const tfsaEnd = Math.max(0, tfsaGrowthBase - tfsaWithdrawal);
+        remainingNeed -= tfsaWithdrawal;
+
+        const totalWealth = rrspEnd + nonRegEnd + tfsaEnd;
+        const yearsFrom2025 = year - 2025;
+
+        rows.push({
+          year, age,
+          withdrawalRequired: safe(withdrawalRequired),
+          withdrawalRequiredPV: safe(pv(withdrawalRequired, inputs.retInflation, yearsFrom2025)),
+          rrspOpen: safe(rrspOpen),
+          rrspWithdrawal: safe(rrspWithdrawal),
+          rrspEnd: safe(rrspEnd),
+          nonRegOpen: safe(nonRegOpen),
+          nonRegWithdrawal: safe(nonRegWithdrawal),
+          nonRegEnd: safe(nonRegEnd),
+          tfsaOpen: safe(tfsaOpen),
+          tfsaWithdrawal: safe(tfsaWithdrawal),
+          tfsaEnd: safe(tfsaEnd),
+          unfundedGap: safe(remainingNeed),
+          totalWealth: safe(totalWealth),
+          totalWealthPV: safe(pv(totalWealth, inputs.retInflation, yearsFrom2025))
+        });
+
+        rrspOpen = rrspEnd;
+        nonRegOpen = nonRegEnd;
+        tfsaOpen = tfsaEnd;
+      }
+      return rows;
+    }
+
+    function renderAccSummary(accRows, retRows) {
+      const accLast = accRows[accRows.length - 1];
+      let depletionAge = null;
+      for (const row of retRows) {
+        if (row.totalWealth <= 0) { depletionAge = row.age; break; }
+      }
+
+      document.getElementById('accSummary').innerHTML = [
+        kpi('Retirement year', String(accLast.year)),
+        kpi('Retirement age', String(accLast.age)),
+        kpi('Wealth at retirement', formatCurrency(accLast.totalWealth), { highlight: true }),
+        kpi('Wealth at retirement (PV)', formatCurrency(accLast.totalWealthPV)),
+        kpi('RRSP at retirement', formatCurrency(accLast.rrspEnd)),
+        kpi('TFSA at retirement', formatCurrency(accLast.tfsaEnd)),
+        kpi('Non-reg at retirement', formatCurrency(accLast.nonRegEnd)),
+        kpi('Depletion age', depletionAge === null ? 'Not depleted' : String(depletionAge), {
+          alert: depletionAge !== null,
+          highlight: depletionAge === null
+        })
+      ].join('');
+
+      document.getElementById('retBridgeDetail').innerHTML =
+        ` · Opening wealth: <strong>${formatCurrency(accLast.totalWealth)}</strong> at age ${accLast.age}`;
+    }
+
+    function renderRetSummary(accRows, retRows) {
+      const accLast = accRows[accRows.length - 1];
+      const retLast = retRows[retRows.length - 1];
+      let depletionAge = null;
+      let totalUnfunded = 0;
+      for (const row of retRows) {
+        totalUnfunded += row.unfundedGap;
+        if (row.totalWealth <= 0 && depletionAge === null) depletionAge = row.age;
+      }
+
+      document.getElementById('retSummary').innerHTML = [
+        kpi('Wealth at retirement', formatCurrency(accLast.totalWealth), { highlight: true }),
+        kpi('Final wealth at end age', formatCurrency(retLast.totalWealth)),
+        kpi('Final wealth (PV)', formatCurrency(retLast.totalWealthPV)),
+        kpi('Depletion age', depletionAge === null ? 'Not depleted' : String(depletionAge), {
+          alert: depletionAge !== null,
+          highlight: depletionAge === null
+        }),
+        kpi('Years in retirement', String(retRows.length)),
+        kpi('Cumulative unfunded gap', formatCurrency(totalUnfunded), { alert: totalUnfunded > 0 })
+      ].join('');
+    }
+
+    function renderAccumulationTable(rows) {
+      const headers = [
+        'Year', 'Age', 'Before-Tax Income', 'After-Tax Income', 'After-Tax Income PV',
+        'Housing Costs', 'Housing Costs PV', 'Other Costs', 'Other Costs PV',
+        'Investable Income', 'Investable Income PV', 'TFSA Contribution', 'RRSP Contribution',
+        'After Contributions', 'Non-Reg Start', 'Non-Reg End', 'Non-Reg End PV',
+        'TFSA Start', 'TFSA End', 'TFSA End PV', 'RRSP Start', 'RRSP End', 'RRSP End PV',
+        'Total Wealth', 'Total Wealth PV'
+      ];
+      let html = '<thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+      rows.forEach(r => {
+        html += `<tr>
+          <td>${r.year}</td><td>${r.age}</td>
+          <td>${formatCurrency(r.beforeTaxIncome)}</td>
+          <td>${formatCurrency(r.afterTaxIncome)}</td>
+          <td>${formatCurrency(r.afterTaxIncomePV)}</td>
+          <td>${formatCurrency(r.housingCosts)}</td>
+          <td>${formatCurrency(r.housingCostsPV)}</td>
+          <td>${formatCurrency(r.otherCosts)}</td>
+          <td>${formatCurrency(r.otherCostsPV)}</td>
+          <td>${formatCurrency(r.investableIncome)}</td>
+          <td>${formatCurrency(r.investableIncomePV)}</td>
+          <td>${formatCurrency(r.tfsaContribution)}</td>
+          <td>${formatCurrency(r.rrspContribution)}</td>
+          <td>${formatCurrency(r.afterContributions)}</td>
+          <td>${formatCurrency(r.nonRegStart)}</td>
+          <td>${formatCurrency(r.nonRegEnd)}</td>
+          <td>${formatCurrency(r.nonRegEndPV)}</td>
+          <td>${formatCurrency(r.tfsaStart)}</td>
+          <td>${formatCurrency(r.tfsaEnd)}</td>
+          <td>${formatCurrency(r.tfsaEndPV)}</td>
+          <td>${formatCurrency(r.rrspStart)}</td>
+          <td>${formatCurrency(r.rrspEnd)}</td>
+          <td>${formatCurrency(r.rrspEndPV)}</td>
+          <td>${formatCurrency(r.totalWealth)}</td>
+          <td>${formatCurrency(r.totalWealthPV)}</td>
+        </tr>`;
+      });
+      html += '</tbody>';
+      document.getElementById('accTable').innerHTML = html;
+    }
+
+    function renderRetirementTable(rows) {
+      const headers = [
+        'Year', 'Age', 'Withdrawal Required', 'Withdrawal PV',
+        'RRSP Opening', 'RRSP Withdrawal', 'RRSP Ending',
+        'Non-Reg Opening', 'Non-Reg Withdrawal', 'Non-Reg Ending',
+        'TFSA Opening', 'TFSA Withdrawal', 'TFSA Ending',
+        'Unfunded Gap', 'Total Wealth', 'Total Wealth PV'
+      ];
+      let html = '<thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+      rows.forEach(r => {
+        const gapStyle = r.unfundedGap > 0 ? 'color:var(--danger);font-weight:700;' : '';
+        html += `<tr>
+          <td>${r.year}</td><td>${r.age}</td>
+          <td>${formatCurrency(r.withdrawalRequired)}</td>
+          <td>${formatCurrency(r.withdrawalRequiredPV)}</td>
+          <td>${formatCurrency(r.rrspOpen)}</td>
+          <td>${formatCurrency(r.rrspWithdrawal)}</td>
+          <td>${formatCurrency(r.rrspEnd)}</td>
+          <td>${formatCurrency(r.nonRegOpen)}</td>
+          <td>${formatCurrency(r.nonRegWithdrawal)}</td>
+          <td>${formatCurrency(r.nonRegEnd)}</td>
+          <td>${formatCurrency(r.tfsaOpen)}</td>
+          <td>${formatCurrency(r.tfsaWithdrawal)}</td>
+          <td>${formatCurrency(r.tfsaEnd)}</td>
+          <td style="${gapStyle}">${formatCurrency(r.unfundedGap)}</td>
+          <td>${formatCurrency(r.totalWealth)}</td>
+          <td>${formatCurrency(r.totalWealthPV)}</td>
+        </tr>`;
+      });
+      html += '</tbody>';
+      document.getElementById('retTable').innerHTML = html;
+    }
+
+    function syncRetirementFieldsToTab() {
+      document.getElementById('retWithdraw0_sync').value = document.getElementById('retWithdraw0').value;
+      document.getElementById('retInflation_sync').value = document.getElementById('retInflation').value;
+      document.getElementById('endAge_sync').value = document.getElementById('endAge').value;
+    }
+
+    function syncRetirementFieldsFromTab() {
+      document.getElementById('retWithdraw0').value = document.getElementById('retWithdraw0_sync').value;
+      document.getElementById('retInflation').value = document.getElementById('retInflation_sync').value;
+      document.getElementById('endAge').value = document.getElementById('endAge_sync').value;
+    }
+
+    let lastAccRows = [];
+    let lastRetRows = [];
+
+    function runPlan() {
+      const inputs = readPlanInputs();
+
+      if (inputs.retireAge < inputs.startAge) {
+        alert('Retirement age must be greater than or equal to start age.');
+        return;
+      }
+      if (inputs.endAge < inputs.retireAge) {
+        alert('Projection end age must be greater than or equal to retirement age.');
+        return;
+      }
+
+      lastAccRows = buildAccumulation(inputs);
+      const retirementStart = lastAccRows[lastAccRows.length - 1];
+      lastRetRows = buildRetirement(inputs, retirementStart);
+
+      renderAccSummary(lastAccRows, lastRetRows);
+      renderRetSummary(lastAccRows, lastRetRows);
+      renderAccumulationTable(lastAccRows);
+      renderRetirementTable(lastRetRows);
+      syncRetirementFieldsToTab();
+
+      document.getElementById('bridgeIncome').textContent = formatCurrency(inputs.income0);
+      const firstNet = afterTaxIncome(inputs.income0, inputs.taxDeductions);
+      document.getElementById('bridgeNet').textContent = formatCurrency(firstNet);
+    }
+
+    /* ========== Boot ========== */
+    calculateIncome();
+    runPlan();
+  </script>
+</body>
+</html>
