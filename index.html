@@ -106,6 +106,28 @@
       color: var(--brand);
     }
 
+    button.example-btn {
+      appearance: none;
+      border: 1px dashed var(--line);
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 999px;
+      cursor: pointer;
+      opacity: 0.72;
+      transition: opacity 0.15s ease, border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+    }
+
+    button.example-btn:hover {
+      opacity: 1;
+      color: var(--brand-dark);
+      border-color: #c5dde9;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
     .tabs {
       display: flex;
       gap: 6px;
@@ -601,6 +623,9 @@
         <a class="chip chip-link" href="https://xavierzhang21.github.io/Fintech_PM/" target="_blank" rel="noopener noreferrer">
           Fully designed and owned by Xavier Zhang
         </a>
+        <button type="button" class="example-btn" onclick="loadExampleScenario()" title="Load a sample scenario">
+          Load sample
+        </button>
       </div>
     </header>
 
@@ -1533,6 +1558,32 @@
     }
 
     /* ========== Boot ========== */
+    function loadExampleScenario() {
+      document.getElementById('income').value = 170000;
+      document.getElementById('income0').value = 170000;
+
+      document.getElementById('retireAge').value = 45;
+      document.getElementById('endAge').value = 90;
+      document.getElementById('incomeGrowth').value = 2.00;
+      document.getElementById('housing0').value = 30000;
+      document.getElementById('other0').value = 36000;
+      document.getElementById('rrsp0').value = 95000;
+      document.getElementById('tfsa0').value = 95000;
+      document.getElementById('nonReg0').value = 230000;
+
+      document.getElementById('rrspReturn').value = 12.00;
+      document.getElementById('tfsaReturn').value = 15.00;
+      document.getElementById('nonRegReturn').value = 12.00;
+
+      document.getElementById('retRrspReturn').value = 8.00;
+      document.getElementById('retTfsaReturn').value = 8.00;
+      document.getElementById('retNonRegReturn').value = 8.00;
+      document.getElementById('retWithdraw0').value = 150000;
+
+      calculateIncome();
+      runPlan();
+    }
+
     calculateIncome();
     runPlan();
   </script>
